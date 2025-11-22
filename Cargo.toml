@@ -3,6 +3,14 @@ name = "gemini-image-test"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "gemini-image-test"
+path = "src/main.rs"
+
+[[bin]]
+name = "generate_dog"
+path = "src/generate_dog.rs"
+
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
 reqwest = { version = "0.11", features = ["json"] }
