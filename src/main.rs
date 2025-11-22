@@ -17,18 +17,33 @@ struct RequestBody {
 
 #[derive(Serialize)]
 struct GenerationConfig {
-    #[serde(rename = "responseModalities")]
-    response_modalities: Vec<String>,
+    temperature: f32,
     #[serde(rename = "maxOutputTokens")]
     max_output_tokens: u32,
+    #[serde(rename = "responseModalities")]
+    response_modalities: Vec<String>,
+    #[serde(rename = "topP")]
+    top_p: f32,
     #[serde(rename = "imageConfig")]
     image_config: ImageConfig,
 }
 
 #[derive(Serialize)]
 struct ImageConfig {
+    #[serde(rename = "aspectRatio")]
+    aspect_ratio: String,
     #[serde(rename = "imageSize")]
     image_size: String,
+    #[serde(rename = "imageOutputOptions")]
+    image_output_options: ImageOutputOptions,
+    #[serde(rename = "personGeneration")]
+    person_generation: String,
+}
+
+#[derive(Serialize)]
+struct ImageOutputOptions {
+    #[serde(rename = "mimeType")]
+    mime_type: String,
 }
 
 #[derive(Serialize)]
@@ -121,10 +136,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         max_tokens: Some(32768), // 增加到最大支持
         temperature: Some(0.7),
         generation_config: Some(GenerationConfig {
-            response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
+            temperature: 1.0,
             max_output_tokens: 32768,
+            response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
+            top_p: 0.95,
             image_config: ImageConfig {
-                image_size: "4K".to_string(), // 设置为4K分辨率
+                aspect_ratio: "1:1".to_string(),
+                image_size: "4K".to_string(),
+                image_output_options: ImageOutputOptions {
+                    mime_type: "image/png".to_string(),
+                },
+                person_generation: "ALLOW_ALL".to_string(),
             },
         }),
     };
@@ -201,8 +223,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("  输出: {}", result.usage.completion_tokens);
         println!("  总计: {}", result.usage.total_tokens);
     } else {
+        let status = response.status();
+        let headers = response.headers().clone();
         let error_text = response.text().await?;
-        println!("请求失败: {}", error_text);
+        println!("请求失败 - 状态码: {}", status);
+        println!("错误内容: {}", error_text);
+
+        // 如果错误内容为空，显示响应头信息
+        if error_text.is_empty() {
+            println!("响应头: {:?}", headers);
+        }
+
+        // 将错误信息保存到文件
+        fs::write("error.txt", format!("Status: {}\nHeaders: {:?}\nError: {}", status, headers, error_text))?;
+        println!("错误信息已保存到 error.txt 文件");
     }
 
     Ok(())
