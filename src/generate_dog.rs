@@ -8,7 +8,7 @@ use dotenv::dotenv;
 struct GeminiRequest {
     contents: Vec<Content>,
     #[serde(rename = "generationConfig")]
-    generation_config: GenerationConfig,
+    // generation_config: GenerationConfig,
 }
 
 #[derive(Serialize)]
@@ -92,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 从环境变量读取配置
     let api_url = env::var("GEMINI_API_URL")
-        .unwrap_or_else(|_| "http://74.249.29.91:8080/v1beta/models/gemini-3-pro-image-preview:generateContent".to_string());
+        .unwrap_or_else(|_| "http://74.249.29.91:8080/v1beta/models/gemini-3-pro-image-preview-4k:generateContent".to_string());
     let api_key = env::var("API_KEY")
         .expect("API_KEY must be set in .env file or environment variables");
 
@@ -106,21 +106,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 ],
             }
-        ],
-        generation_config: GenerationConfig {
-            temperature: 1.0,
-            max_output_tokens: 32768,
-            response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
-            top_p: 0.95,
-            image_config: ImageConfig {
-                aspect_ratio: "1:1".to_string(),
-                image_size: "1K".to_string(),
-                image_output_options: ImageOutputOptions {
-                    mime_type: "image/png".to_string(),
-                },
-                person_generation: "ALLOW_ALL".to_string(),
-            },
-        },
+        ]
+        // generation_config: GenerationConfig {
+        //     temperature: 1.0,
+        //     max_output_tokens: 32768,
+        //     response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
+        //     top_p: 0.95,
+        //     image_config: ImageConfig {
+        //         aspect_ratio: "1:1".to_string(),
+        //         image_size: "1K".to_string(),
+        //         image_output_options: ImageOutputOptions {
+        //             mime_type: "image/png".to_string(),
+        //         },
+        //         person_generation: "ALLOW_ALL".to_string(),
+        //     },
+        // },
     };
 
     println!("发送图像生成请求到 Gemini 3 Pro Image Preview...");
