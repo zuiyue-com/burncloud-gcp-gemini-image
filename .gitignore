@@ -5,6 +5,8 @@ download
 downloads
 data
 *.png
+dog_generation_response.txt
+dog_generation_error.txt
 
 # Rust build artifacts
 /target/

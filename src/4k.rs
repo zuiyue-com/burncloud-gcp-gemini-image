@@ -114,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             top_p: 0.95,
             image_config: ImageConfig {
                 aspect_ratio: "1:1".to_string(),
-                image_size: "1K".to_string(),
+                image_size: "2K".to_string(),
                 image_output_options: ImageOutputOptions {
                     mime_type: "image/png".to_string(),
                 },
