@@ -3,12 +3,31 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use base64::Engine;
 use dotenv::dotenv;
+use regex::Regex;
+
+// 从Markdown文本中提取图片数据
+fn extract_image_from_markdown(text: &str) -> Option<(String, Vec<u8>)> {
+    // 匹配 ![image](data:image/png;base64,xxxxx) 格式
+    let re = Regex::new(r"!\[.*?\]\(data:(image/[a-zA-Z]+);base64,([A-Za-z0-9+/=]+)\)").ok()?;
+
+    if let Some(captures) = re.captures(text) {
+        let mime_type = captures.get(1)?.as_str().to_string();
+        let base64_data = captures.get(2)?.as_str();
+
+        // 解码base64数据
+        if let Ok(image_bytes) = base64::engine::general_purpose::STANDARD.decode(base64_data) {
+            return Some((mime_type, image_bytes));
+        }
+    }
+
+    None
+}
 
 #[derive(Serialize)]
 struct GeminiRequest {
     contents: Vec<Content>,
     #[serde(rename = "generationConfig")]
-    generation_config: GenerationConfig,
+    generation_config: Option<GenerationConfig>,
 }
 
 #[derive(Serialize)]
@@ -92,7 +111,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 从环境变量读取配置
     let api_url = env::var("GEMINI_API_URL")
-        .unwrap_or_else(|_| "http://74.249.29.91:8080/v1beta/models/gemini-3-pro-image-preview:generateContent".to_string());
+        .unwrap_or_else(|_| "http://74.249.29.91:8080/v1beta/models/gemini-3-pro-image-preview-4k:generateContent".to_string());
     let api_key = env::var("API_KEY")
         .expect("API_KEY must be set in .env file or environment variables");
 
@@ -107,6 +126,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ],
             }
         ],
+<<<<<<< HEAD:src/4k.rs
         generation_config: GenerationConfig {
             temperature: 1.0,
             max_output_tokens: 32768,
@@ -121,6 +141,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 person_generation: "ALLOW_ALL".to_string(),
             },
         },
+=======
+        generation_config: None,
+        // generation_config: Some(GenerationConfig {
+        //     temperature: 1.0,
+        //     max_output_tokens: 32768,
+        //     response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
+        //     top_p: 0.95,
+        //     image_config: ImageConfig {
+        //         aspect_ratio: "1:1".to_string(),
+        //         image_size: "1K".to_string(),
+        //         image_output_options: ImageOutputOptions {
+        //             mime_type: "image/png".to_string(),
+        //         },
+        //         person_generation: "ALLOW_ALL".to_string(),
+        //     },
+        // }),
+>>>>>>> eee9fcdfa0884459a0276bab3de0c7c1b9905dcc:src/generate_dog.rs
     };
 
     println!("发送图像生成请求到 Gemini 3 Pro Image Preview...");
@@ -164,6 +201,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     // 保存文本回复
                     std::fs::write("dog_generation_response.txt", text)?;
                     println!("文本回复已保存到 dog_generation_response.txt 文件");
+
+                    // 尝试从文本中提取图片
+                    if let Some((mime_type, image_bytes)) = extract_image_from_markdown(text) {
+                        let file_extension = if mime_type.contains("png") {
+                            "png"
+                        } else if mime_type.contains("jpeg") || mime_type.contains("jpg") {
+                            "jpg"
+                        } else if mime_type.contains("gif") {
+                            "gif"
+                        } else if mime_type.contains("webp") {
+                            "webp"
+                        } else {
+                            "png"
+                        };
+
+                        let output_filename = format!("generated_dog_from_markdown.{}", file_extension);
+                        std::fs::write(&output_filename, &image_bytes)?;
+                        println!("从Markdown中提取的狗图片已保存到 {} 文件", output_filename);
+                    }
                 }
             }
         }
