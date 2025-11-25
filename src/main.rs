@@ -141,7 +141,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
             top_p: 0.95,
             image_config: ImageConfig {
-                aspect_ratio: "1:1".to_string(),
+                aspect_ratio: "16:9".to_string(),
                 image_size: "4K".to_string(),
                 image_output_options: ImageOutputOptions {
                     mime_type: "image/png".to_string(),

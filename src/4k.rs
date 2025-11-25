@@ -126,38 +126,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ],
             }
         ],
-<<<<<<< HEAD:src/4k.rs
-        generation_config: GenerationConfig {
+      generation_config: Some(GenerationConfig {
             temperature: 1.0,
             max_output_tokens: 32768,
             response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
             top_p: 0.95,
             image_config: ImageConfig {
-                aspect_ratio: "1:1".to_string(),
-                image_size: "2K".to_string(),
+                aspect_ratio: "16:9".to_string(),
+                image_size: "4K".to_string(),
                 image_output_options: ImageOutputOptions {
                     mime_type: "image/png".to_string(),
                 },
                 person_generation: "ALLOW_ALL".to_string(),
             },
-        },
-=======
-        generation_config: None,
-        // generation_config: Some(GenerationConfig {
-        //     temperature: 1.0,
-        //     max_output_tokens: 32768,
-        //     response_modalities: vec!["TEXT".to_string(), "IMAGE".to_string()],
-        //     top_p: 0.95,
-        //     image_config: ImageConfig {
-        //         aspect_ratio: "1:1".to_string(),
-        //         image_size: "1K".to_string(),
-        //         image_output_options: ImageOutputOptions {
-        //             mime_type: "image/png".to_string(),
-        //         },
-        //         person_generation: "ALLOW_ALL".to_string(),
-        //     },
-        // }),
->>>>>>> eee9fcdfa0884459a0276bab3de0c7c1b9905dcc:src/generate_dog.rs
+        }),
     };
 
     println!("发送图像生成请求到 Gemini 3 Pro Image Preview...");
